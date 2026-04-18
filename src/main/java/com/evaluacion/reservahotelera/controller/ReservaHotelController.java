@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.Map;
@@ -33,7 +34,9 @@ public class ReservaHotelController {
             @RequestParam String nombreHuesped,
             @RequestParam int numeroHabitacion,
             @RequestParam String fechaEntrada,
-            @RequestParam String fechaSalida
+            @RequestParam String fechaSalida,
+            @RequestParam(required = false) BigDecimal montoPago,
+            @RequestParam(required = false) String metodoPago
     ) {
         LocalDate fechaEntradaParseada;
         LocalDate fechaSalidaParseada;
@@ -47,7 +50,15 @@ public class ReservaHotelController {
             ));
         }
 
-        Map<String, Object> resultado = reservaHotelService.crearReserva(id, nombreHuesped, numeroHabitacion, fechaEntradaParseada, fechaSalidaParseada);
+        Map<String, Object> resultado = reservaHotelService.crearReserva(
+            id,
+            nombreHuesped,
+            numeroHabitacion,
+            fechaEntradaParseada,
+            fechaSalidaParseada,
+            montoPago,
+            metodoPago
+        );
         if (Boolean.FALSE.equals(resultado.get("ok"))) {
             return ResponseEntity.badRequest().body(resultado);
         }

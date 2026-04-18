@@ -1,5 +1,6 @@
 package com.evaluacion.reservahotelera.repository;
 
+import com.evaluacion.reservahotelera.model.Habitacion;
 import com.evaluacion.reservahotelera.model.ReservaHotel;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -10,11 +11,18 @@ public interface ReservaHotelRepository extends JpaRepository<ReservaHotel, Inte
 
 	List<ReservaHotel> findAllByOrderByIdAsc();
 
-	List<ReservaHotel> findAllByOrderByNumeroHabitacionAsc();
-
-	List<ReservaHotel> findAllByEstadoIgnoreCaseNotAndFechaEntradaLessThanEqualAndFechaSalidaGreaterThanOrderByNumeroHabitacionAsc(
+	List<ReservaHotel> findAllByEstadoIgnoreCaseNotAndFechaEntradaLessThanEqualAndFechaSalidaGreaterThan(
 			String estado,
 			LocalDate fechaEntrada,
 			LocalDate fechaSalida
 	);
+
+	boolean existsByHabitacionAndEstadoIgnoreCaseNotAndFechaEntradaLessThanAndFechaSalidaGreaterThan(
+			Habitacion habitacion,
+			String estado,
+			LocalDate fechaSalida,
+			LocalDate fechaEntrada
+	);
+
+	boolean existsByHabitacionAndEstadoIgnoreCaseNot(Habitacion habitacion, String estado);
 }
