@@ -1,17 +1,39 @@
 package com.evaluacion.reservahotelera.model;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
 import java.time.LocalDate;
 
+@Entity
+@Table(name = "RESERVA_HOTEL")
 public class ReservaHotel {
 
-    private int id;
+    @Id
+    @Column(name = "ID")
+    private Integer id;
+
+    @Column(name = "NOMBRE_HUESPED")
     private String nombreHuesped;
-    private int numeroHabitacion;
+
+    @Column(name = "NUMERO_HABITACION")
+    private Integer numeroHabitacion;
+
+    @Column(name = "FECHA_ENTRADA")
     private LocalDate fechaEntrada;
+
+    @Column(name = "FECHA_SALIDA")
     private LocalDate fechaSalida;
+
+    @Column(name = "ESTADO")
     private String estado;
 
-    public ReservaHotel(int id, String nombreHuesped, int numeroHabitacion, LocalDate fechaEntrada, LocalDate fechaSalida, String estado) {
+    public ReservaHotel() {
+    }
+
+    public ReservaHotel(Integer id, String nombreHuesped, Integer numeroHabitacion, LocalDate fechaEntrada, LocalDate fechaSalida, String estado) {
         this.id = id;
         this.nombreHuesped = nombreHuesped;
         this.numeroHabitacion = numeroHabitacion;
@@ -20,11 +42,11 @@ public class ReservaHotel {
         this.estado = estado;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -36,11 +58,11 @@ public class ReservaHotel {
         this.nombreHuesped = nombreHuesped;
     }
 
-    public int getNumeroHabitacion() {
+    public Integer getNumeroHabitacion() {
         return numeroHabitacion;
     }
 
-    public void setNumeroHabitacion(int numeroHabitacion) {
+    public void setNumeroHabitacion(Integer numeroHabitacion) {
         this.numeroHabitacion = numeroHabitacion;
     }
 
