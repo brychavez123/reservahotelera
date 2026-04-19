@@ -24,5 +24,13 @@ public interface ReservaHotelRepository extends JpaRepository<ReservaHotel, Inte
 			LocalDate fechaEntrada
 	);
 
+	boolean existsByHabitacionAndEstadoIgnoreCaseNotAndIdNotAndFechaEntradaLessThanAndFechaSalidaGreaterThan(
+			Habitacion habitacion,
+			String estado,
+			Integer id,
+			LocalDate fechaSalida,
+			LocalDate fechaEntrada
+	);
+
 	boolean existsByHabitacionAndEstadoIgnoreCaseNot(Habitacion habitacion, String estado);
 }

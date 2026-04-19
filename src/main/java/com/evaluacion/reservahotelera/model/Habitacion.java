@@ -19,16 +19,16 @@ public class Habitacion {
     @Column(name = "NUMERO_HABITACION", nullable = false, unique = true)
     private Integer numeroHabitacion;
 
-    @Column(name = "ESTADO", nullable = false, length = 20)
-    private String estado;
+    @Column(name = "CAPACIDAD_PERSONAS")
+    private Integer capacidadPersonas;
 
     public Habitacion() {
     }
 
-    public Habitacion(Integer id, Integer numeroHabitacion, String estado) {
+    public Habitacion(Integer id, Integer numeroHabitacion, Integer capacidadPersonas) {
         this.id = id;
         this.numeroHabitacion = numeroHabitacion;
-        this.estado = estado;
+        this.capacidadPersonas = capacidadPersonas;
     }
 
     public Integer getId() {
@@ -47,11 +47,11 @@ public class Habitacion {
         this.numeroHabitacion = numeroHabitacion;
     }
 
-    public String getEstado() {
-        return estado;
+    public Integer getCapacidadPersonas() {
+        return capacidadPersonas;
     }
 
-    public void setEstado(String estado) {
-        this.estado = estado;
+    public void setCapacidadPersonas(Integer capacidadPersonas) {
+        this.capacidadPersonas = capacidadPersonas;
     }
 }

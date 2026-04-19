@@ -3,7 +3,9 @@ package com.evaluacion.reservahotelera.controller;
 import com.evaluacion.reservahotelera.service.ReservaHotelService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -59,6 +61,43 @@ public class ReservaHotelController {
             montoPago,
             metodoPago
         );
+        if (Boolean.FALSE.equals(resultado.get("ok"))) {
+            return ResponseEntity.badRequest().body(resultado);
+        }
+        return ResponseEntity.ok(resultado);
+    }
+
+    @PutMapping("/reservas/{id}")
+    public ResponseEntity<?> actualizarReserva(
+            @PathVariable int id,
+            @RequestParam(required = false) Integer numeroHabitacion,
+            @RequestParam(required = false) String fechaEntrada,
+            @RequestParam(required = false) String fechaSalida
+    ) {
+        LocalDate fechaEntradaParseada = null;
+        LocalDate fechaSalidaParseada = null;
+
+        try {
+            if (fechaEntrada != null && !fechaEntrada.isBlank()) {
+                fechaEntradaParseada = LocalDate.parse(fechaEntrada);
+            }
+            if (fechaSalida != null && !fechaSalida.isBlank()) {
+                fechaSalidaParseada = LocalDate.parse(fechaSalida);
+            }
+        } catch (DateTimeParseException ex) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "ok", false,
+                    "error", "Ponga una fecha correcta con formato yyyy-MM-dd"
+            ));
+        }
+
+        Map<String, Object> resultado = reservaHotelService.actualizarReserva(
+                id,
+                numeroHabitacion,
+                fechaEntradaParseada,
+                fechaSalidaParseada
+        );
+
         if (Boolean.FALSE.equals(resultado.get("ok"))) {
             return ResponseEntity.badRequest().body(resultado);
         }

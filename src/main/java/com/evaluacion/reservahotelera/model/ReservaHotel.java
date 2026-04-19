@@ -37,6 +37,12 @@ public class ReservaHotel {
     @Column(name = "FECHA_SALIDA")
     private LocalDate fechaSalida;
 
+    @Column(name = "NOMBRE_HUESPED")
+    private String nombreHuesped;
+
+    @Column(name = "NUMERO_HABITACION")
+    private Integer numeroHabitacion;
+
     @Column(name = "ESTADO")
     private String estado;
 
@@ -53,6 +59,8 @@ public class ReservaHotel {
         this.habitacion = habitacion;
         this.fechaEntrada = fechaEntrada;
         this.fechaSalida = fechaSalida;
+        this.nombreHuesped = huesped != null ? huesped.getNombre() : null;
+        this.numeroHabitacion = habitacion != null ? habitacion.getNumeroHabitacion() : null;
         this.estado = estado;
     }
 
@@ -112,14 +120,20 @@ public class ReservaHotel {
         this.pago = pago;
     }
 
-    @Transient
     public String getNombreHuesped() {
-        return huesped != null ? huesped.getNombre() : null;
+        return nombreHuesped;
     }
 
-    @Transient
+    public void setNombreHuesped(String nombreHuesped) {
+        this.nombreHuesped = nombreHuesped;
+    }
+
     public Integer getNumeroHabitacion() {
-        return habitacion != null ? habitacion.getNumeroHabitacion() : null;
+        return numeroHabitacion;
+    }
+
+    public void setNumeroHabitacion(Integer numeroHabitacion) {
+        this.numeroHabitacion = numeroHabitacion;
     }
 
     @Transient

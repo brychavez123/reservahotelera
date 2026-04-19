@@ -73,7 +73,14 @@ public class ReservaHotelService {
             .orElseGet(() -> huespedRepository.save(new Huesped(null, nombreNormalizado)));
 
         Habitacion habitacion = habitacionRepository.findByNumeroHabitacion(numeroHabitacion)
-            .orElseGet(() -> habitacionRepository.save(new Habitacion(null, numeroHabitacion, "DISPONIBLE")));
+            .orElse(null);
+
+        if (habitacion == null) {
+            return Map.of(
+                    "ok", false,
+                    "error", "La habitacion no existe en el mantenedor. Registrela primero."
+            );
+        }
 
         boolean habitacionOcupadaEnRango = reservaHotelRepository
             .existsByHabitacionAndEstadoIgnoreCaseNotAndFechaEntradaLessThanAndFechaSalidaGreaterThan(
@@ -88,10 +95,9 @@ public class ReservaHotelService {
         }
 
         ReservaHotel reserva = new ReservaHotel(id, huesped, habitacion, fechaEntrada, fechaSalida, "CONFIRMADA");
+        reserva.setNombreHuesped(nombreNormalizado);
+        reserva.setNumeroHabitacion(habitacion.getNumeroHabitacion());
         ReservaHotel guardada = reservaHotelRepository.save(reserva);
-
-        habitacion.setEstado("RESERVADA");
-        habitacionRepository.save(habitacion);
 
         BigDecimal monto = montoPago != null ? montoPago : BigDecimal.ZERO;
         String metodo = (metodoPago == null || metodoPago.isBlank()) ? "SIN_DEFINIR" : metodoPago.trim();
@@ -115,6 +121,81 @@ public class ReservaHotelService {
         );
     }
 
+    public Map<String, Object> actualizarReserva(
+            int id,
+            Integer numeroHabitacion,
+            LocalDate fechaEntrada,
+            LocalDate fechaSalida
+    ) {
+        ReservaHotel reserva = reservaHotelRepository.findById(id).orElse(null);
+        if (reserva == null) {
+            return Map.of("ok", false, "error", "No existe una reserva con ese id");
+        }
+        if ("CANCELADA".equalsIgnoreCase(reserva.getEstado())) {
+            return Map.of("ok", false, "error", "No se puede modificar una reserva cancelada");
+        }
+        if (numeroHabitacion == null && fechaEntrada == null && fechaSalida == null) {
+            return Map.of("ok", false, "error", "Debe enviar al menos un dato para actualizar");
+        }
+
+        Habitacion habitacionFinal = reserva.getHabitacion();
+        if (numeroHabitacion != null) {
+            if (numeroHabitacion <= 0) {
+                return Map.of("ok", false, "error", "El numero de habitacion debe ser mayor a 0");
+            }
+
+            Habitacion habitacionBuscada = habitacionRepository.findByNumeroHabitacion(numeroHabitacion)
+                    .orElse(null);
+
+            if (habitacionBuscada == null) {
+                return Map.of("ok", false, "error", "La habitacion no existe en el mantenedor");
+            }
+            habitacionFinal = habitacionBuscada;
+        }
+
+        if (habitacionFinal == null) {
+            return Map.of(
+                    "ok", false,
+                    "error", "La reserva no tiene habitacion asociada. Envie numeroHabitacion para corregirla"
+            );
+        }
+
+        LocalDate fechaEntradaFinal = fechaEntrada != null ? fechaEntrada : reserva.getFechaEntrada();
+        LocalDate fechaSalidaFinal = fechaSalida != null ? fechaSalida : reserva.getFechaSalida();
+
+        if (fechaEntradaFinal == null || fechaSalidaFinal == null) {
+            return Map.of("ok", false, "error", "La reserva debe tener fecha de entrada y salida");
+        }
+        if (!fechaSalidaFinal.isAfter(fechaEntradaFinal)) {
+            return Map.of("ok", false, "error", "La fecha de salida debe ser posterior a la fecha de entrada");
+        }
+
+        boolean habitacionOcupadaEnRango = reservaHotelRepository
+                .existsByHabitacionAndEstadoIgnoreCaseNotAndIdNotAndFechaEntradaLessThanAndFechaSalidaGreaterThan(
+                        habitacionFinal,
+                        "CANCELADA",
+                        id,
+                        fechaSalidaFinal,
+                        fechaEntradaFinal
+                );
+
+        if (habitacionOcupadaEnRango) {
+            return Map.of("ok", false, "error", "La habitacion ya esta reservada para ese rango de fechas");
+        }
+
+        reserva.setHabitacion(habitacionFinal);
+        reserva.setNumeroHabitacion(habitacionFinal.getNumeroHabitacion());
+        reserva.setFechaEntrada(fechaEntradaFinal);
+        reserva.setFechaSalida(fechaSalidaFinal);
+
+        ReservaHotel actualizada = reservaHotelRepository.save(reserva);
+        return Map.of(
+                "ok", true,
+                "mensaje", "Reserva actualizada correctamente.",
+                "data", actualizada
+        );
+    }
+
     public Map<String, Object> cancelarReserva(int id) {
         ReservaHotel reserva = reservaHotelRepository.findById(id).orElse(null);
         if (reserva == null) {
@@ -132,13 +213,6 @@ public class ReservaHotelService {
             pagoRepository.save(pago);
             actualizada.setPago(pago);
         });
-
-        Habitacion habitacion = actualizada.getHabitacion();
-        if (habitacion != null) {
-            boolean tieneReservasActivas = reservaHotelRepository.existsByHabitacionAndEstadoIgnoreCaseNot(habitacion, "CANCELADA");
-            habitacion.setEstado(tieneReservasActivas ? "RESERVADA" : "DISPONIBLE");
-            habitacionRepository.save(habitacion);
-        }
 
         return Map.of("ok", true, "data", actualizada);
     }
