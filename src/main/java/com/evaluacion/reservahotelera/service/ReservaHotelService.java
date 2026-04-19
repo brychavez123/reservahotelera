@@ -8,6 +8,8 @@ import com.evaluacion.reservahotelera.repository.HabitacionRepository;
 import com.evaluacion.reservahotelera.repository.HuespedRepository;
 import com.evaluacion.reservahotelera.repository.PagoRepository;
 import com.evaluacion.reservahotelera.repository.ReservaHotelRepository;
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -40,6 +42,14 @@ public class ReservaHotelService {
 
     public List<ReservaHotel> listarReservas() {
         return reservaHotelRepository.findAllByOrderByIdAsc();
+    }
+
+    public Map<String, Object> buscarReservaPorId(int id) {
+        ReservaHotel reserva = reservaHotelRepository.findById(id).orElse(null);
+        if (reserva == null) {
+            return Map.of("ok", false, "error", "No existe una reserva con ese id");
+        }
+        return Map.of("ok", true, "data", reserva);
     }
 
     public Map<String, Object> crearReserva(
@@ -193,6 +203,33 @@ public class ReservaHotelService {
                 "ok", true,
                 "mensaje", "Reserva actualizada correctamente.",
                 "data", actualizada
+        );
+    }
+
+    public Map<String, Object> eliminarReserva(int id) {
+        if (!reservaHotelRepository.existsById(id)) {
+            return Map.of("ok", false, "error", "No existe una reserva con ese id");
+        }
+
+        try {
+            pagoRepository.deleteByReservaId(id);
+            reservaHotelRepository.deleteDirectById(id);
+        } catch (DataIntegrityViolationException ex) {
+            return Map.of(
+                    "ok", false,
+                    "error", "No se pudo eliminar la reserva por datos relacionados en la base de datos"
+            );
+        } catch (DataAccessException ex) {
+            return Map.of(
+                    "ok", false,
+                    "error", "No se pudo eliminar la reserva por una inconsistencia de relacion en base de datos"
+            );
+        }
+
+        return Map.of(
+                "ok", true,
+                "mensaje", "Reserva eliminada correctamente.",
+                "id", id
         );
     }
 

@@ -1,5 +1,6 @@
 package com.evaluacion.reservahotelera;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -24,6 +25,14 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(Map.of(
                 "ok", false,
                 "error", "Falta un parametro requerido: " + ex.getParameterName()
+        ));
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<?> manejarIntegridadDatos(DataIntegrityViolationException ex) {
+        return ResponseEntity.badRequest().body(Map.of(
+                "ok", false,
+                "error", "No se pudo completar la operacion por restricciones de integridad en base de datos"
         ));
     }
 

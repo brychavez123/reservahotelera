@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,6 +29,15 @@ public class ReservaHotelController {
     @GetMapping("/reservas")
     public ResponseEntity<?> listarReservas() {
         return ResponseEntity.ok(reservaHotelService.listarReservas());
+    }
+
+    @GetMapping("/reservas/{id}")
+    public ResponseEntity<?> buscarReservaPorId(@PathVariable int id) {
+        Map<String, Object> resultado = reservaHotelService.buscarReservaPorId(id);
+        if (Boolean.FALSE.equals(resultado.get("ok"))) {
+            return ResponseEntity.badRequest().body(resultado);
+        }
+        return ResponseEntity.ok(resultado);
     }
 
     @PostMapping("/reservas")
@@ -98,6 +108,15 @@ public class ReservaHotelController {
                 fechaSalidaParseada
         );
 
+        if (Boolean.FALSE.equals(resultado.get("ok"))) {
+            return ResponseEntity.badRequest().body(resultado);
+        }
+        return ResponseEntity.ok(resultado);
+    }
+
+    @DeleteMapping("/reservas/{id}")
+    public ResponseEntity<?> eliminarReserva(@PathVariable int id) {
+        Map<String, Object> resultado = reservaHotelService.eliminarReserva(id);
         if (Boolean.FALSE.equals(resultado.get("ok"))) {
             return ResponseEntity.badRequest().body(resultado);
         }
