@@ -14,7 +14,7 @@ import jakarta.persistence.Transient;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "RESERVA_HOTEL")
+@Table(name = "HOTEL_RESERVA_HOTEL")
 public class ReservaHotel {
 
     @Id

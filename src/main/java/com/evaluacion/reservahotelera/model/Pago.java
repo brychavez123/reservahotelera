@@ -16,7 +16,7 @@ import jakarta.persistence.Transient;
 import java.math.BigDecimal;
 
 @Entity
-@Table(name = "PAGO")
+@Table(name = "HOTEL_PAGO")
 public class Pago {
 
     @Id
