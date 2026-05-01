@@ -1,0 +1,14 @@
+services:
+    microservicio:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        ports:
+            - "8080:8080"
+        environment:
+            SPRING_DATASOURCE_URL: jdbc:oracle:thin:@ugnfm3wc8em1nfqi_high
+            DB_USERNAME: CHAVEZ
+            SPRING_DATASOURCE_PASSWORD: ClaseFS123456-
+            WALLET_PATH: /app/wallet
+            TNS_ADMIN: /app/wallet
+        restart: always
