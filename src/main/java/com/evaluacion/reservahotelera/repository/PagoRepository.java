@@ -10,7 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 
 public interface PagoRepository extends JpaRepository<Pago, Integer> {
-	Optional<Pago> findByReservaId(Integer reservaId);
+	@Query("select p from Pago p where p.reserva.id = :reservaId")
+	Optional<Pago> findByReservaId(@Param("reservaId") Integer reservaId);
 
 	@Modifying
 	@Transactional
